@@ -1,4 +1,4 @@
-/* pagina.js · Versão 2 · 26/11/2026 */
+/* pagina.js · Versão 3 · 26/11/2026 */
 const $$ = (s) => document.querySelectorAll(s);
 const SENS = [['tp2', 'TP2', 'bar'], ['tp3', 'TP3', 'bar'], ['h1', 'H1', 'bar'], ['dv', 'Secador', 'bar'],
   ['reserv', 'Reservatório', 'bar'], ['oleo', 'Óleo', '°C'], ['corrente', 'Corrente', 'A'], ['carga', 'Em carga', 'fração']];
@@ -63,17 +63,22 @@ requestAnimationFrame(passo);
 
 $$('.gd-play').forEach((b) => b.addEventListener('click', () => {
   if (!S.tocando && cache && S.i >= cache.length - 1) mover(0);
+  marcar('livre');
   tocar(!S.tocando);
 }));
 
-const obs = new IntersectionObserver((es) => es.forEach((e) => {
-  if (!e.isIntersecting) return;
-  $$('.gd-chapter').forEach((c) => c.classList.toggle('on', c === e.target));
-  S.cena = e.target.getAttribute('data-cena');
+/* índice ao lado do modelo: cada item leva a animação até uma cena */
+function marcar(cena) {
+  S.cena = cena;
+  $$('.gd-chapter').forEach((c) => c.classList.toggle('on', c.getAttribute('data-cena') === cena));
+}
+$$('.gd-chapter').forEach((b) => b.addEventListener('click', () => {
+  marcar(b.getAttribute('data-cena'));
+  tocar(false);
   const L = linhas();
-  if (L && S.cena !== 'livre') { tocar(false); mover(indiceDaCena(L, S.cena)); }
-}), { root: document, rootMargin: window.innerWidth < 720 ? '-65% 0px -30% 0px' : '-45% 0px -45% 0px' });
-$$('.gd-chapter').forEach((c, i) => { if (!i) c.classList.add('on'); obs.observe(c); });
+  if (L && S.cena !== 'livre') mover(indiceDaCena(L, S.cena));
+}));
+marcar(S.cena);
 
 dash.draw('origem', (el) => {
   const L = linhas(), real = L && L[0].origem === 'real';
@@ -127,7 +132,7 @@ dash.draw('barra', {
   mount: (el) => {
     const s = document.createElement('input');
     s.type = 'range'; s.min = 0; s.setAttribute('aria-label', 'Hora reproduzida');
-    s.addEventListener('input', () => { tocar(false); mover(+s.value); });
+    s.addEventListener('input', () => { marcar('livre'); tocar(false); mover(+s.value); });
     el.append(s); return s;
   },
   update: (el, s) => { const L = linhas(); s.disabled = !L; if (L) { s.max = L.length - 1; s.value = S.i; } }
@@ -182,7 +187,7 @@ dash.draw('indice', (el) => {
       tip.style('left', Math.max(0, Math.min(w - tip.node().offsetWidth, x(r.t) + 8)) + 'px');
     })
     .on('pointerleave', () => tip.style('display', 'none'))
-    .on('click', (e) => { tocar(false); mover(acha(e)); });
+    .on('click', (e) => { marcar('livre'); tocar(false); mover(acha(e)); });
 });
 
 ['reserv', 'oleo', 'corrente'].forEach((k) => dash.draw('m-' + k, (el) => {

@@ -1,10 +1,10 @@
 <!doctype html>
-<!-- index.html · Versão 2 · 26/11/2026 -->
+<!-- index.html · Versão 3 · 26/11/2026 -->
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Gêmeo digital do compressor · v2 · 26/11/2026</title>
+<title>Gêmeo digital do compressor · v3 · 26/11/2026</title>
 <meta name="description" content="Protótipo de gêmeo digital e detecção de anomalias em um compressor de ar, com a base aberta MetroPT-3 (CC BY 4.0).">
 <link rel="stylesheet" href="tema.css">
 <link rel="stylesheet" href="estilo.css">
@@ -14,7 +14,7 @@
 <div class="gd">
 <header>
 <h1>Gêmeo digital de um compressor de ar</h1>
-<p class="gd-sub">Versão 2 · 26/11/2026</p>
+<p class="gd-sub">Versão 3 · 26/11/2026</p>
 <div data-draw="origem" data-source="horas" data-field="origem"></div>
 <p class="gd-aviso gd-demo" hidden><b>Dados de exemplo (sintéticos).</b> As leituras e as falhas foram inventadas para testar o protótipo. Os resultados não dizem nada sobre um equipamento real.</p>
 <p class="gd-aviso gd-real" hidden><b>Dados do MetroPT-3</b>, resumidos em médias por hora.</p>
@@ -23,28 +23,13 @@
 </header>
 
 <div class="gd-story">
-<div class="gd-chapters">
-<section class="gd-chapter" id="cap-normal" data-cena="normal">
-<h2>1. Operação normal</h2>
-<p>O modelo reproduz as leituras hora a hora. Cada peça recebe a cor do sensor ligado a ela. Arraste o modelo para girar.</p>
-</section>
-<section class="gd-chapter" id="cap-treino" data-cena="treino">
-<h2>2. O primeiro mês ensina o normal</h2>
-<p>Com fevereiro de 2020, o detector calcula o valor típico e a variação de cada sensor. Uma peça fica em atenção quando o desvio passa do que quase todo o treino mostrou, e fica anômala quando passa do dobro.</p>
-</section>
-<section class="gd-chapter" id="cap-falha1" data-cena="0">
-<h2>3. Primeira falha</h2>
-<p>Esta é a hora de maior desvio dentro da primeira janela de falha. Veja quais peças mudam de cor.</p>
-</section>
-<section class="gd-chapter" id="cap-falha2" data-cena="1">
-<h2>4. Segunda falha</h2>
-<p>O índice de anomalia resume os três sensores mais desviados. Duas horas seguidas acima do limite geram um alarme.</p>
-</section>
-<section class="gd-chapter" id="cap-livre" data-cena="livre">
-<h2>5. Explore</h2>
-<p>Use <i>Reproduzir</i>, arraste a barra de tempo ou clique no gráfico do índice para escolher qualquer hora.</p>
-</section>
-</div>
+<nav class="gd-indice" aria-label="Cenas da animação">
+<button type="button" class="gd-chapter" id="cap-normal" data-cena="normal">1. Operação normal</button>
+<button type="button" class="gd-chapter" id="cap-treino" data-cena="treino">2. O primeiro mês ensina o normal</button>
+<button type="button" class="gd-chapter" id="cap-falha1" data-cena="0">3. Primeira falha</button>
+<button type="button" class="gd-chapter" id="cap-falha2" data-cena="1">4. Segunda falha</button>
+<button type="button" class="gd-chapter" id="cap-livre" data-cena="livre">5. Explore</button>
+</nav>
 
 <div class="gd-stage" id="modelo">
 <div class="gd-card">
@@ -89,7 +74,7 @@
 <p class="gd-demo" hidden>Nenhuma leitura do MetroPT-3 está nesta versão.</p>
 <p class="gd-real" hidden>Alterações feitas: médias por hora, índice de anomalia e estados calculados a partir das leituras originais.</p>
 <p>O modelo 3D é um esquema simplificado, desenhado para este protótipo. A posição das peças não representa o equipamento real.</p>
-<p><a href="https://github.com/jvictor88493/gemeo-digital-compressor" target="_blank" rel="noopener">Código no GitHub</a> · Versão 2 · 26/11/2026</p>
+<p><a href="https://github.com/jvictor88493/gemeo-digital-compressor" target="_blank" rel="noopener">Código no GitHub</a> · Versão 3 · 26/11/2026</p>
 </footer>
 </div>
 </main>
