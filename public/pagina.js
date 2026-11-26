@@ -1,11 +1,11 @@
-/* pagina.js · Versão 3 · 26/11/2026 */
+/* pagina.js · Versão 7 · 26/11/2026 */
 const $$ = (s) => document.querySelectorAll(s);
 const SENS = [['tp2', 'TP2', 'bar'], ['tp3', 'TP3', 'bar'], ['h1', 'H1', 'bar'], ['dv', 'Secador', 'bar'],
   ['reserv', 'Reservatório', 'bar'], ['oleo', 'Óleo', '°C'], ['corrente', 'Corrente', 'A'], ['carga', 'Em carga', 'fração']];
 const nf = new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 2 });
 const quando = d3.utcFormat('%d/%m/%Y %Hh'), curto = d3.utcFormat('%d/%m');
-const S = { i: 0, tocando: false, cena: 'normal', iniciado: false, giro: -0.55, incl: 0.5 };
-let cache = null, de = null;
+const S = { i: 0, tocando: false, iniciado: false, giro: -0.55, incl: 0.5 };
+let cache = null, de = null, tipico = null;
 
 function linhas() {
   const d = dash.data('horas');
@@ -13,25 +13,17 @@ function linhas() {
   if (de !== d.data) {
     de = d.data;
     cache = d.data.map((r) => ({ ...r, t: new Date(r.hora + 'Z') }));
+    /* valor típico de cada sensor: mediana do treino, a mesma referência do detector */
+    const treino = cache.filter((r) => r.periodo === 'treino');
+    tipico = Object.fromEntries(SENS.map(([k]) => [k, d3.median(treino, (r) => +r[k])]));
     S.i = Math.min(S.i, cache.length - 1);
-    if (!S.iniciado) { S.i = indiceDaCena(cache, S.cena); S.iniciado = true; }
+    /* abre num dia de operação normal */
+    if (!S.iniciado) { S.i = Math.min(36, cache.length - 1); S.iniciado = true; }
   }
   return cache;
 }
 
-function indiceDaCena(L, cena) {
-  const treino = () => L.reduce((m, r, i) => r.periodo === 'treino' ? i : m, 0);
-  if (cena === 'normal') return Math.min(36, L.length - 1);
-  if (cena === 'treino') return treino();
-  const nomes = [...new Set(L.map((r) => r.falha).filter(Boolean))];
-  const nome = nomes[+cena];
-  if (!nome) return S.i;
-  let melhor = -1;
-  L.forEach((r, i) => { if (r.falha === nome && (melhor < 0 || +r.indice > +L[melhor].indice)) melhor = i; });
-  return melhor;
-}
-
-const MOVEIS = ['gemeo', 'quando', 'situacao', 'barra', 'leituras', 'indice', 'm-reserv', 'm-oleo', 'm-corrente'];
+const MOVEIS = ['alerta', 'gemeo', 'quando', 'situacao', 'barra', 'leituras', 'indice', 'm-reserv', 'm-oleo', 'm-corrente'];
 function mover(i) {
   const L = linhas(); if (!L) return;
   S.i = Math.max(0, Math.min(L.length - 1, Math.round(i)));
@@ -63,22 +55,8 @@ requestAnimationFrame(passo);
 
 $$('.gd-play').forEach((b) => b.addEventListener('click', () => {
   if (!S.tocando && cache && S.i >= cache.length - 1) mover(0);
-  marcar('livre');
   tocar(!S.tocando);
 }));
-
-/* índice ao lado do modelo: cada item leva a animação até uma cena */
-function marcar(cena) {
-  S.cena = cena;
-  $$('.gd-chapter').forEach((c) => c.classList.toggle('on', c.getAttribute('data-cena') === cena));
-}
-$$('.gd-chapter').forEach((b) => b.addEventListener('click', () => {
-  marcar(b.getAttribute('data-cena'));
-  tocar(false);
-  const L = linhas();
-  if (L && S.cena !== 'livre') mover(indiceDaCena(L, S.cena));
-}));
-marcar(S.cena);
 
 dash.draw('origem', (el) => {
   const L = linhas(), real = L && L[0].origem === 'real';
@@ -92,6 +70,59 @@ dash.draw('origem', (el) => {
   el.setAttribute('data-field', campo); el.setAttribute('data-row', '0');
   el.textContent = r.status === 'ok' && r.data.length ? r.data[0][campo] : '—';
 }));
+
+/* aviso do visualizador: estado da hora, o que saiu do normal e as mudanças anteriores */
+const NOMES = { tp2: 'Pressão no compressor (TP2)', tp3: 'Pressão no painel (TP3)', h1: 'Pressão no separador (H1)',
+  dv: 'Pressão de descarga do secador', reserv: 'Pressão do reservatório', oleo: 'Temperatura do óleo',
+  corrente: 'Corrente do motor', carga: 'Tempo em carga' };
+const ESTADOS = [['Normal', 0], ['Atenção', 1], ['Desvio acima do limite', 1], ['Anomalia detectada', 2]];
+const estadoDe = (r) => +r.alarme ? 3 : +r.indice > +r.limite ? 2 : SENS.some(([k]) => +r['st_' + k]) ? 1 : 0;
+const diaHora = d3.utcFormat('%d/%m %Hh');
+
+/* primeira hora do trecho contínuo (sem lacunas) com o mesmo estado da hora i */
+function inicioDoTrecho(L, i) {
+  const e = estadoDe(L[i]);
+  while (i > 0 && L[i].t - L[i - 1].t <= 36e5 && estadoDe(L[i - 1]) === e) i--;
+  return i;
+}
+
+function bloco(tag, classe, texto) {
+  const n = document.createElement(tag);
+  n.className = classe;
+  if (texto) n.textContent = texto;
+  return n;
+}
+
+dash.draw('alerta', (el) => {
+  const L = linhas();
+  if (!L) { el.textContent = '—'; return; }
+  const r = L[S.i], e = estadoDe(r), ini = inicioDoTrecho(L, S.i);
+  const topo = bloco('div', 'gd-al-topo e' + ESTADOS[e][1]);
+  topo.append(bloco('b', '', ESTADOS[e][0]), bloco('span', '', 'desde ' + diaHora(L[ini].t)));
+
+  const fora = SENS.map(([k]) => k).filter((k) => +r['st_' + k]).sort((a, b) => r['st_' + b] - r['st_' + a]);
+  const lista = bloco('ul', 'gd-al-lista');
+  lista.append(...fora.slice(0, 4).map((k) => {
+    const alto = +r[k] > tipico[k], st = +r['st_' + k];
+    const seta = alto ? '▲ ' : '▼ ', como = `: ${st > 1 ? 'muito ' : ''}${alto ? 'acima' : 'abaixo'}`;
+    const item = bloco('li', 'e' + st);
+    /* nome completo em telas largas; no celular, o mesmo nome curto das leituras */
+    item.append(bloco('span', 'gd-longo', seta + NOMES[k] + como + ' do normal'),
+      bloco('span', 'gd-curto', seta + SENS.find((s) => s[0] === k)[1] + como));
+    return item;
+  }));
+  if (fora.length > 4) lista.append(bloco('li', 'e1', '+ ' + (fora.length - 4) + ' fora do normal'));
+  if (!fora.length) lista.append(bloco('li', 'e0', e ? 'Nenhum sensor passou sozinho do limite; o desvio é do conjunto' : 'Todos os sensores dentro do normal'));
+
+  const antes = [];
+  for (let j = ini; j > 0 && antes.length < 2;) {
+    if (L[j].t - L[j - 1].t > 36e5) antes.push('Sem dados até ' + diaHora(L[j].t));
+    if (antes.length === 2) break;
+    j = inicioDoTrecho(L, j - 1);
+    antes.push(`${ESTADOS[estadoDe(L[j])][0]} (${diaHora(L[j].t)})`);
+  }
+  el.replaceChildren(topo, lista, bloco('div', 'gd-al-antes', antes.length ? 'Antes: ' + antes.join(' · ') : 'Início dos dados'));
+});
 
 dash.draw('gemeo', {
   mount: (el) => {
@@ -132,7 +163,7 @@ dash.draw('barra', {
   mount: (el) => {
     const s = document.createElement('input');
     s.type = 'range'; s.min = 0; s.setAttribute('aria-label', 'Hora reproduzida');
-    s.addEventListener('input', () => { marcar('livre'); tocar(false); mover(+s.value); });
+    s.addEventListener('input', () => { tocar(false); mover(+s.value); });
     el.append(s); return s;
   },
   update: (el, s) => { const L = linhas(); s.disabled = !L; if (L) { s.max = L.length - 1; s.value = S.i; } }
@@ -187,7 +218,7 @@ dash.draw('indice', (el) => {
       tip.style('left', Math.max(0, Math.min(w - tip.node().offsetWidth, x(r.t) + 8)) + 'px');
     })
     .on('pointerleave', () => tip.style('display', 'none'))
-    .on('click', (e) => { marcar('livre'); tocar(false); mover(acha(e)); });
+    .on('click', (e) => { tocar(false); mover(acha(e)); });
 });
 
 ['reserv', 'oleo', 'corrente'].forEach((k) => dash.draw('m-' + k, (el) => {
