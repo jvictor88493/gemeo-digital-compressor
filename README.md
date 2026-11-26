@@ -1,6 +1,6 @@
 # Gêmeo digital de um compressor de ar
 
-**Versão 4 · 26/11/2026**
+**Versão 7 · 26/11/2026**
 
 **Site:** https://gemeo-digital-compressor.vercel.app
 
@@ -8,6 +8,7 @@ Protótipo de gêmeo digital e análise preditiva industrial com a base aberta M
 
 ## Versões
 
+- **7 (26/11/2026):** aviso do estado de cada hora junto ao modelo (normal, atenção, desvio acima do limite, anomalia); índice lateral que só abre o texto, sem mexer na animação; topo reduzido; versão deixou de aparecer na página. Reúne as versões 5 a 7 do painel. Dados e detector não mudaram.
 - **4 (26/11/2026):** modelo 3D refeito com peças detalhadas (motor, compressor, resfriador, separador, torres, reservatório, painel e tubulação), em WebGL próprio.
 - **3 (26/11/2026):** os textos ao lado da animação viraram um índice clicável. Dados e detector não mudaram (arquivos da versão 2).
 - **2 (26/11/2026):** primeira versão publicada, com os dados reais do MetroPT-3.
