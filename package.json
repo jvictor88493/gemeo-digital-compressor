@@ -1,0 +1,15 @@
+{
+  "name": "gemeo-digital-compressor",
+  "version": "2.0.0",
+  "description": "Versão 2 · 26/11/2026 · Gêmeo digital e detecção de anomalias com a base MetroPT-3",
+  "private": true,
+  "type": "module",
+  "engines": { "node": "22.x" },
+  "scripts": {
+    "build": "node scripts/carregar.mjs && node scripts/montar.mjs"
+  },
+  "dependencies": {
+    "@neondatabase/serverless": "1.2.1",
+    "d3": "7.9.2"
+  }
+}

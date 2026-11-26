@@ -1,0 +1,103 @@
+<!doctype html>
+<!-- index.html · Versão 2 · 26/11/2026 -->
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Gêmeo digital do compressor · v2 · 26/11/2026</title>
+<meta name="description" content="Protótipo de gêmeo digital e detecção de anomalias em um compressor de ar, com a base aberta MetroPT-3 (CC BY 4.0).">
+<link rel="stylesheet" href="tema.css">
+<link rel="stylesheet" href="estilo.css">
+</head>
+<body>
+<main>
+<div class="gd">
+<header>
+<h1>Gêmeo digital de um compressor de ar</h1>
+<p class="gd-sub">Versão 2 · 26/11/2026</p>
+<div data-draw="origem" data-source="horas" data-field="origem"></div>
+<p class="gd-aviso gd-demo" hidden><b>Dados de exemplo (sintéticos).</b> As leituras e as falhas foram inventadas para testar o protótipo. Os resultados não dizem nada sobre um equipamento real.</p>
+<p class="gd-aviso gd-real" hidden><b>Dados do MetroPT-3</b>, resumidos em médias por hora.</p>
+<p>O detector sinalizou <b data-draw="detectadas" data-source="resumo">—</b> de <b data-draw="falhas" data-source="resumo">—</b> falhas. Longe delas, ficou em alarme em <b data-draw="fora" data-source="resumo">—</b> de <b data-draw="fora_total" data-source="resumo">—</b> horas de teste.</p>
+<p>Um período qualquer do mesmo tamanho (a janela da falha e as 24 horas anteriores) teria algum alarme em <b data-draw="acaso_min" data-source="resumo">—</b>% a <b data-draw="acaso_max" data-source="resumo">—</b>% das vezes. Por isso, “sinalizada” sozinho prova pouco: veja na tabela as horas em alarme durante cada falha.</p>
+</header>
+
+<div class="gd-story">
+<div class="gd-chapters">
+<section class="gd-chapter" id="cap-normal" data-cena="normal">
+<h2>1. Operação normal</h2>
+<p>O modelo reproduz as leituras hora a hora. Cada peça recebe a cor do sensor ligado a ela. Arraste o modelo para girar.</p>
+</section>
+<section class="gd-chapter" id="cap-treino" data-cena="treino">
+<h2>2. O primeiro mês ensina o normal</h2>
+<p>Com fevereiro de 2020, o detector calcula o valor típico e a variação de cada sensor. Uma peça fica em atenção quando o desvio passa do que quase todo o treino mostrou, e fica anômala quando passa do dobro.</p>
+</section>
+<section class="gd-chapter" id="cap-falha1" data-cena="0">
+<h2>3. Primeira falha</h2>
+<p>Esta é a hora de maior desvio dentro da primeira janela de falha. Veja quais peças mudam de cor.</p>
+</section>
+<section class="gd-chapter" id="cap-falha2" data-cena="1">
+<h2>4. Segunda falha</h2>
+<p>O índice de anomalia resume os três sensores mais desviados. Duas horas seguidas acima do limite geram um alarme.</p>
+</section>
+<section class="gd-chapter" id="cap-livre" data-cena="livre">
+<h2>5. Explore</h2>
+<p>Use <i>Reproduzir</i>, arraste a barra de tempo ou clique no gráfico do índice para escolher qualquer hora.</p>
+</section>
+</div>
+
+<div class="gd-stage" id="modelo">
+<div class="gd-card">
+<div data-draw="gemeo" data-source="horas"></div>
+<div class="gd-status"><b data-draw="quando" data-source="horas">—</b><span data-draw="situacao" data-source="horas">—</span></div>
+<div class="gd-controls">
+<button type="button" class="gd-play"><span class="gd-l-play">Reproduzir</span><span class="gd-l-pause" hidden>Pausar</span></button>
+<select class="dash-select gd-speed" aria-label="Velocidade"><option value="3">3 h por segundo</option><option value="12" selected>12 h por segundo</option><option value="48">2 dias por segundo</option></select>
+<div class="gd-slider" data-draw="barra" data-source="horas"></div>
+</div>
+<div class="gd-legend"><span><i class="s0"></i>Normal</span><span><i class="s1"></i>Atenção</span><span><i class="s2"></i>Anômalo</span></div>
+<div class="gd-read" data-draw="leituras" data-source="horas"></div>
+</div>
+</div>
+</div>
+
+<section id="indice">
+<h2>Índice de anomalia ao longo do tempo</h2>
+<p>Linha tracejada: limite. Faixas sombreadas: janelas de falha. Clique para levar o modelo até a hora.</p>
+<div class="gd-card"><div class="gd-chart" data-draw="indice" data-source="horas"></div></div>
+</section>
+
+<section id="sensores">
+<h2>Pressão, temperatura e corrente em torno da hora escolhida</h2>
+<p>Três dias antes e três dias depois.</p>
+<div class="gd-three">
+<div class="gd-card"><h3>Reservatório (bar)</h3><div class="gd-mini" data-draw="m-reserv" data-source="horas"></div></div>
+<div class="gd-card"><h3>Temperatura do óleo (°C)</h3><div class="gd-mini" data-draw="m-oleo" data-source="horas"></div></div>
+<div class="gd-card"><h3>Corrente do motor (A)</h3><div class="gd-mini" data-draw="m-corrente" data-source="horas"></div></div>
+</div>
+</section>
+
+<section id="falhas">
+<h2>Falhas e resposta do detector</h2>
+<p>Conta como sinalizada a falha com alarme entre 24 horas antes do início e o fim da janela. O aviso compara o início da falha com o momento em que o alarme se confirma. Um alarme nas 24 horas anteriores pode não ter relação com a falha.</p>
+<div class="gd-scroll"><table data-source="eventos" data-row-key="falha"><thead><tr><th data-field="falha">Falha</th><th data-field="inicio">Início</th><th data-field="horas">Horas com dados</th><th data-field="em_alarme">Horas em alarme na janela</th><th data-field="sinalizada">Sinalizada</th><th data-field="aviso">Aviso</th></tr></thead><tbody data-draw="tabela"></tbody></table></div>
+</section>
+
+<footer>
+<h2>Dados e licença</h2>
+<p>Base de referência: <a href="https://archive.ics.uci.edu/dataset/791" target="_blank" rel="noopener">MetroPT-3 Dataset</a>, de N. Davari, B. Veloso, R. Ribeiro e J. Gama (2023), UCI Machine Learning Repository, DOI 10.24432/C5VW3R, licença <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a>.</p>
+<p class="gd-demo" hidden>Nenhuma leitura do MetroPT-3 está nesta versão.</p>
+<p class="gd-real" hidden>Alterações feitas: médias por hora, índice de anomalia e estados calculados a partir das leituras originais.</p>
+<p>O modelo 3D é um esquema simplificado, desenhado para este protótipo. A posição das peças não representa o equipamento real.</p>
+<p><a href="https://github.com/jvictor88493/gemeo-digital-compressor" target="_blank" rel="noopener">Código no GitHub</a> · Versão 2 · 26/11/2026</p>
+</footer>
+</div>
+</main>
+<script src="vendor/d3.min.js"></script>
+<script src="painel.js"></script>
+<script src="calculos.js"></script>
+<script src="modelo.js"></script>
+<script src="pagina.js"></script>
+<script>carregarDados();</script>
+</body>
+</html>

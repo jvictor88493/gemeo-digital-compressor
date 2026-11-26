@@ -1,0 +1,7 @@
+# .gitignore · Versão 2 · 26/11/2026
+node_modules/
+public/vendor/
+.env
+.env.*
+.vercel/
+*.csv
