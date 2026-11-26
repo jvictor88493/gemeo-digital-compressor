@@ -1,6 +1,6 @@
 # Gêmeo digital de um compressor de ar
 
-**Versão 3 · 26/11/2026**
+**Versão 4 · 26/11/2026**
 
 **Site:** https://gemeo-digital-compressor.vercel.app
 
@@ -8,6 +8,7 @@ Protótipo de gêmeo digital e análise preditiva industrial com a base aberta M
 
 ## Versões
 
+- **4 (26/11/2026):** modelo 3D refeito com peças detalhadas (motor, compressor, resfriador, separador, torres, reservatório, painel e tubulação), em WebGL próprio.
 - **3 (26/11/2026):** os textos ao lado da animação viraram um índice clicável. Dados e detector não mudaram (arquivos da versão 2).
 - **2 (26/11/2026):** primeira versão publicada, com os dados reais do MetroPT-3.
 
@@ -15,7 +16,7 @@ Protótipo de gêmeo digital e análise preditiva industrial com a base aberta M
 
 | Pasta ou arquivo | Conteúdo |
 |---|---|
-| `public/` | Página (HTML, CSS e JavaScript; modelo 3D desenhado em canvas) |
+| `public/` | Página (HTML, CSS e JavaScript; modelo 3D desenhado em WebGL, sem biblioteca 3D) |
 | `api/horas.js` | Função da Vercel que lê o banco |
 | `scripts/carregar.mjs` | Cria as tabelas no Neon (Postgres) e carrega os dados |
 | `dados/` | Médias por hora e estados calculados pelo detector |
@@ -42,7 +43,7 @@ Protótipo de gêmeo digital e análise preditiva industrial com a base aberta M
 - Fora das janelas de falha e das 24 horas anteriores, o detector ficou em alarme em 593 de 3557 horas de teste.
 - Um período qualquer do mesmo tamanho tem algum alarme em 52% a 74% das vezes. Por isso, **a antecipação das falhas não está demonstrada**.
 - As janelas de falha vêm dos relatórios publicados com a base. Horas fora delas não são garantidamente normais.
-- O modelo 3D é um esquema; a posição das peças não representa o equipamento real.
+- O modelo 3D é fictício e foi gerado por código neste projeto, sem arquivos de terceiros. Não representa o equipamento real.
 
 ## Rodar
 
