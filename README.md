@@ -2,6 +2,8 @@
 
 **Versão 2 · 26/11/2026**
 
+**Site:** https://gemeo-digital-compressor.vercel.app
+
 Protótipo de gêmeo digital e análise preditiva industrial com a base aberta MetroPT-3 (compressor de ar de um trem de metrô). A página reproduz as leituras hora a hora, colore um modelo 3D simplificado conforme o estado de cada sensor e mostra o resultado de um detector de anomalias.
 
 ## Estrutura
