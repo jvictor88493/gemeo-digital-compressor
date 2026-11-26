@@ -1,7 +1,7 @@
 {
   "name": "gemeo-digital-compressor",
-  "version": "7.0.0",
-  "description": "Versão 7 · 26/11/2026 · Gêmeo digital e detecção de anomalias com a base MetroPT-3",
+  "version": "8.0.0",
+  "description": "Versão 8 · 26/11/2026 · Gêmeo digital e detecção de anomalias com a base MetroPT-3",
   "private": true,
   "type": "module",
   "engines": {
